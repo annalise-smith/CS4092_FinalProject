@@ -1,3 +1,5 @@
+CREATE DATABASE IF NOT EXISTS ecommerce;
+USE ecommerce;
 
 -- DROP TABLES IF THEY EXIST
 DROP TABLE IF EXISTS Purchase, CreditCard, Product, Customer, Staff;
