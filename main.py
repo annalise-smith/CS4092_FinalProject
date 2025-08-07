@@ -23,3 +23,45 @@ except mysql.connector.Error as err:
 
 except Exception as e:
     print("Unexpected error:", e)
+
+def main_menu():
+    while True:
+        print("\n--- E-Commerce CLI ---")
+        print("1. View Products")
+        print("2. Add Product (Staff)")
+        print("3. Make Purchase (Customer)")
+        print("4. View Purchases")
+        print("5. Exit")
+
+        choice = input("Select option: ")
+
+        if choice == '1':
+            view_products()
+        elif choice == '2':
+            add_product()
+        elif choice == '3':
+            make_purchase()
+        elif choice == '4':
+            view_purchases()
+        elif choice == '5':
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid option.")
+
+def view_products():
+    print("Come back")
+
+def add_product():
+    print("Come back")
+
+def make_purchase():
+    print("Come back")
+
+def view_purchases():
+    print("Come back")
+
+main_menu()
+
+cursor.close()
+db.close()
