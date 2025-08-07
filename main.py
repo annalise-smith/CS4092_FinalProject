@@ -70,7 +70,17 @@ def add_product():
     print("Product added successfully.")
 
 def make_purchase():
-    print("Come back")
+    customer_id = int(input("Customer ID: "))
+    view_products()
+    product_id = int(input("Enter Product ID to buy: "))
+    quantity = int(input("Quantity: "))
+    today = date.today()
+    cursor.execute("""
+        INSERT INTO Purchase (CustomerID, ProductID, PurchaseDate, Quantity)
+        VALUES (%s, %s, %s, %s)
+    """, (customer_id, product_id, today, quantity))
+    db.commit()
+    print("Purchase successful!")
 
 def view_purchases():
     print("Come back")
