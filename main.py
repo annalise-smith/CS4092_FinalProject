@@ -53,7 +53,17 @@ def view_products():
     print("Come back")
 
 def add_product():
-    print("Come back")
+    name = input("Product name: ")
+    desc = input("Description: ")
+    category = input("Category: ")
+    price = float(input("Price: "))
+    stock = int(input("Stock quantity: "))
+    cursor.execute("""
+        INSERT INTO Product (Name, Description, Category, Price, Stock)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (name, desc, category, price, stock))
+    db.commit()
+    print("Product added successfully.")
 
 def make_purchase():
     print("Come back")
