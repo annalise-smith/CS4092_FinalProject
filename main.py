@@ -50,7 +50,11 @@ def main_menu():
             print("Invalid option.")
 
 def view_products():
-    print("Come back")
+    cursor.execute("SELECT ProductID, Name, Price, Stock FROM Product")
+    products = cursor.fetchall()
+    print("\n--- Product Catalog ---")
+    for p in products:
+        print(f"ID: {p[0]}, {p[1]} - ${p[2]} ({p[3]} in stock)")
 
 def add_product():
     print("Come back")
