@@ -83,7 +83,16 @@ def make_purchase():
     print("Purchase successful!")
 
 def view_purchases():
-    print("Come back")
+    cursor.execute("""
+        SELECT c.Name, p.Name, pu.Quantity, pu.PurchaseDate
+        FROM Purchase pu
+        JOIN Customer c ON pu.CustomerID = c.CustomerID
+        JOIN Product p ON pu.ProductID = p.ProductID
+    """)
+    results = cursor.fetchall()
+    print("\n--- Purchases ---")
+    for r in results:
+        print(f"{r[0]} bought {r[2]} x {r[1]} on {r[3]}")
 
 main_menu()
 
