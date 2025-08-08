@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS Purchase, Product, Customer, Staff;
 CREATE TABLE Customer (
     CustomerID INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(100),
-    Email VARCHAR(100) UNIQUE,
+    Email VARCHAR(100) UNIQUE
 );
 
 -- PRODUCT TABLE
