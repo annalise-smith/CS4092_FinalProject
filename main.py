@@ -4,6 +4,7 @@ from datetime import date
 print("Script started")
 
 logged_in_staff = None
+logged_in_customer = None
 
 try:
     print("Trying to connect to database...")
@@ -65,7 +66,18 @@ def main_menu():
             print("Invalid option.")
 
 def login_customer():
-    print("\n--- Customer Login ---")
+    global logged_in_customer
+    email = input("Customer email: ")
+    # You could add password later, for now just email is enough as simple login
+    cursor.execute("SELECT CustomerID, Name FROM Customer WHERE Email = %s", (email,))
+    result = cursor.fetchone()
+    if result:
+        logged_in_customer = {'id': result[0], 'name': result[1]}
+        print(f"Customer login successful! Welcome, {result[1]}.")
+        return True
+    else:
+        print("Login failed: email not found.")
+        return False
 
 def login_staff():
     global logged_in_staff
@@ -183,7 +195,15 @@ def update_product_info():
         print("Error updating product:", err)
 
 def logout():
-    print("Logging out...")
+    global logged_in_staff, logged_in_customer
+    if logged_in_staff:
+        print("Staff logged out.")
+        logged_in_staff = None
+    if logged_in_customer:
+        print("Customer logged out.")
+        logged_in_customer = None
+    if not logged_in_staff and not logged_in_customer:
+        print("No user currently logged in.")
 
 main_menu()
 
