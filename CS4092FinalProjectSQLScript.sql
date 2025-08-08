@@ -2,7 +2,7 @@ CREATE DATABASE IF NOT EXISTS ecommerce;
 USE ecommerce;
 
 -- DROP TABLES IF THEY EXIST
-DROP TABLE IF EXISTS Purchase, CreditCard, Product, Customer, Staff;
+DROP TABLE IF EXISTS Purchase, Product, Customer, Staff;
 
 -- CUSTOMER TABLE
 CREATE TABLE Customer (
@@ -10,15 +10,6 @@ CREATE TABLE Customer (
     Name VARCHAR(100),
     Email VARCHAR(100) UNIQUE,
     Phone VARCHAR(20)
-);
-
--- CREDIT CARD TABLE
-CREATE TABLE CreditCard (
-    CardID INT PRIMARY KEY AUTO_INCREMENT,
-    CustomerID INT,
-    CardNumber VARCHAR(16),
-    ExpirationDate DATE,
-    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID)
 );
 
 -- PRODUCT TABLE
@@ -57,13 +48,6 @@ INSERT INTO Customer (Name, Email, Phone)
 VALUES 
 ('Alice Smith', 'alice@example.com', '123-456-7890'),
 ('Bob Johnson', 'bob@example.com', '234-567-8901');
-
--- Credit Cards
-INSERT INTO CreditCard (CustomerID, CardNumber, ExpirationDate)
-VALUES 
-(1, '1111222233334444', '2026-12-31'),
-(1, '5555666677778888', '2027-06-30'),
-(2, '9999000011112222', '2025-11-15');
 
 -- Products
 INSERT INTO Product (Name, Description, Category, Price, Stock)
