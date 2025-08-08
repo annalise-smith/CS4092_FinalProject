@@ -30,33 +30,58 @@ except Exception as e:
 def main_menu():
     while True:
         print("\n--- E-Commerce CLI ---")
-        print("1. View Products")
-        print("2. Add Product (Staff)")
-        print("3. Make Purchase (Customer)")
-        print("4. View Purchases")
-        print("5. Staff Login")
-        print("6. Update Product Info (Staff)")
-        print("7. Exit")
+        print("1. Customer Login")
+        print("2. Staff Login")
+        print("3. View Products")
+        print("4. Make Purchase (Customer)")
+        print("5. View Purchases")
+        print("6. Add Product (Staff)")
+        print("7. Update Product Info (Staff)")
+        print("8. Logout")
+        print("9. Exit")
 
         choice = input("Select option: ")
 
         if choice == '1':
-            view_products()
+            login_customer()
         elif choice == '2':
-            add_product()
-        elif choice == '3':
-            make_purchase()
-        elif choice == '4':
-            view_purchases()
-        elif choice == '5':
             login_staff()
+        elif choice == '3':
+            view_products()
+        elif choice == '4':
+            make_purchase()
+        elif choice == '5':
+            view_purchases()
         elif choice == '6':
-            update_product_info()
+            add_product()
         elif choice == '7':
+            update_product_info()
+        elif choice == '8':
+            logout()
+        elif choice == '9':
             print("Goodbye!")
             break
         else:
             print("Invalid option.")
+
+def login_customer():
+    print("\n--- Customer Login ---")
+
+def login_staff():
+    global logged_in_staff
+    username = input("Staff username: ")
+    password = input("Staff password: ")
+
+    cursor.execute("SELECT StaffID FROM Staff WHERE Username = %s AND Password = %s", (username, password))
+    result = cursor.fetchone()
+    
+    if result:
+        logged_in_staff = result[0]
+        print("Login successful!")
+        return True
+    else:
+        print("Login failed.")
+        return False
 
 def view_products():
     cursor.execute("SELECT ProductID, Name, Price, Stock FROM Product")
@@ -64,23 +89,6 @@ def view_products():
     print("\n--- Product Catalog ---")
     for p in products:
         print(f"ID: {p[0]}, {p[1]} - ${p[2]} ({p[3]} in stock)")
-
-def add_product():
-    if not login_staff():
-        print("You must log in as staff to add products.")
-        return  
-
-    name = input("Product name: ")
-    desc = input("Description: ")
-    category = input("Category: ")
-    price = float(input("Price: "))
-    stock = int(input("Stock quantity: "))
-    cursor.execute("""
-        INSERT INTO Product (Name, Description, Category, Price, Stock)
-        VALUES (%s, %s, %s, %s, %s)
-    """, (name, desc, category, price, stock))
-    db.commit()
-    print("Product added successfully.")
 
 def make_purchase():
     customer_id = int(input("Customer ID: "))
@@ -107,21 +115,22 @@ def view_purchases():
     for r in results:
         print(f"{r[0]} bought {r[2]} x {r[1]} on {r[3]}")
 
-def login_staff():
-    global logged_in_staff
-    username = input("Staff username: ")
-    password = input("Staff password: ")
+def add_product():
+    if not login_staff():
+        print("You must log in as staff to add products.")
+        return  
 
-    cursor.execute("SELECT StaffID FROM Staff WHERE Username = %s AND Password = %s", (username, password))
-    result = cursor.fetchone()
-    
-    if result:
-        logged_in_staff = result[0]
-        print("Login successful!")
-        return True
-    else:
-        print("Login failed.")
-        return False
+    name = input("Product name: ")
+    desc = input("Description: ")
+    category = input("Category: ")
+    price = float(input("Price: "))
+    stock = int(input("Stock quantity: "))
+    cursor.execute("""
+        INSERT INTO Product (Name, Description, Category, Price, Stock)
+        VALUES (%s, %s, %s, %s, %s)
+    """, (name, desc, category, price, stock))
+    db.commit()
+    print("Product added successfully.")
 
 def update_product_info():
     global logged_in_staff
@@ -172,6 +181,9 @@ def update_product_info():
         print("Product updated successfully.")
     except mysql.connector.Error as err:
         print("Error updating product:", err)
+
+def logout():
+    print("Logging out...")
 
 main_menu()
 
