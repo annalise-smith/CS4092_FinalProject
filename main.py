@@ -68,7 +68,7 @@ def main_menu():
 def login_customer():
     global logged_in_customer
     email = input("Customer email: ")
-    # You could add password later, for now just email is enough as simple login
+    # Might add password later, for now just email is enough as simple login
     cursor.execute("SELECT CustomerID, Name FROM Customer WHERE Email = %s", (email,))
     result = cursor.fetchone()
     if result:
@@ -103,19 +103,35 @@ def view_products():
         print(f"ID: {p[0]}, {p[1]} - ${p[2]} ({p[3]} in stock)")
 
 def make_purchase():
-    customer_id = int(input("Customer ID: "))
+    global logged_in_customer
+    if not logged_in_customer:
+        print("You must log in as a customer to make a purchase.")
+        if not login_customer():
+            return
+        
+    customer_id = logged_in_customer['id']
     view_products()
-    product_id = int(input("Enter Product ID to buy: "))
-    quantity = int(input("Quantity: "))
-    today = date.today()
-    cursor.execute("""
-        INSERT INTO Purchase (CustomerID, ProductID, PurchaseDate, Quantity)
-        VALUES (%s, %s, %s, %s)
-    """, (customer_id, product_id, today, quantity))
-    db.commit()
-    print("Purchase successful!")
+    try:
+        product_id = int(input("Enter Product ID to buy: "))
+        quantity = int(input("Quantity: "))
+        today = date.today()
+        cursor.execute("""
+            INSERT INTO Purchase (CustomerID, ProductID, PurchaseDate, Quantity)
+            VALUES (%s, %s, %s, %s)
+        """, (customer_id, product_id, today, quantity))
+        db.commit()
+        print("Purchase successful!")
+    except Exception as e:
+        print("Error making purchase:", e)
 
 def view_purchases():
+    global logged_in_customer
+    if not logged_in_customer:
+        print("You must log in as a customer to view purchases.")
+        if not login_customer():
+            return
+
+    customer_id = logged_in_customer['id']
     cursor.execute("""
         SELECT c.Name, p.Name, pu.Quantity, pu.PurchaseDate
         FROM Purchase pu
@@ -124,6 +140,9 @@ def view_purchases():
     """)
     results = cursor.fetchall()
     print("\n--- Purchases ---")
+    if not results:
+        print("No purchases found.")
+        return
     for r in results:
         print(f"{r[0]} bought {r[2]} x {r[1]} on {r[3]}")
 
