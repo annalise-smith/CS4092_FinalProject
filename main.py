@@ -2,6 +2,9 @@ import mysql.connector
 from datetime import date
 
 print("Script started")
+
+logged_in_staff = None
+
 try:
     print("Trying to connect to database...")
     db = mysql.connector.connect(
@@ -93,6 +96,22 @@ def view_purchases():
     print("\n--- Purchases ---")
     for r in results:
         print(f"{r[0]} bought {r[2]} x {r[1]} on {r[3]}")
+
+def login_staff():
+    global logged_in_staff
+    username = input("Staff username: ")
+    password = input("Staff password: ")
+
+    cursor.execute("SELECT StaffID FROM Staff WHERE Username = %s AND Password = %s", (username, password))
+    result = cursor.fetchone()
+    
+    if result:
+        logged_in_staff = result[0]
+        print("Login successful!")
+        return True
+    else:
+        print("Login failed.")
+        return False
 
 main_menu()
 
