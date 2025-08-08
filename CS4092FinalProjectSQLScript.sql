@@ -9,7 +9,6 @@ CREATE TABLE Customer (
     CustomerID INT PRIMARY KEY AUTO_INCREMENT,
     Name VARCHAR(100),
     Email VARCHAR(100) UNIQUE,
-    Phone VARCHAR(20)
 );
 
 -- PRODUCT TABLE
@@ -44,10 +43,10 @@ CREATE TABLE Staff (
 -- SAMPLE DATA
 
 -- Customers
-INSERT INTO Customer (Name, Email, Phone)
+INSERT INTO Customer (Name, Email)
 VALUES 
-('Alice Smith', 'alice@example.com', '123-456-7890'),
-('Bob Johnson', 'bob@example.com', '234-567-8901');
+('Alice Smith', 'alice@example.com'),
+('Bob Johnson', 'bob@example.com');
 
 -- Products
 INSERT INTO Product (Name, Description, Category, Price, Stock)
