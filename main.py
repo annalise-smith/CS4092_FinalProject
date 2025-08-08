@@ -34,7 +34,8 @@ def main_menu():
         print("2. Add Product (Staff)")
         print("3. Make Purchase (Customer)")
         print("4. View Purchases")
-        print("5. Exit")
+        print("5. Staff Login")
+        print("6. Exit")
 
         choice = input("Select option: ")
 
@@ -47,6 +48,8 @@ def main_menu():
         elif choice == '4':
             view_purchases()
         elif choice == '5':
+            login_staff()
+        elif choice == '6':
             print("Goodbye!")
             break
         else:
@@ -61,6 +64,7 @@ def view_products():
 
 def add_product():
     if not login_staff():
+        print("You must log in as staff to add products.")
         return  
 
     name = input("Product name: ")
