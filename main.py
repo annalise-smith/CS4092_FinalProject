@@ -35,7 +35,8 @@ def main_menu():
         print("3. Make Purchase (Customer)")
         print("4. View Purchases")
         print("5. Staff Login")
-        print("6. Exit")
+        print("6. Update Product Info (Staff)")
+        print("7. Exit")
 
         choice = input("Select option: ")
 
@@ -50,6 +51,8 @@ def main_menu():
         elif choice == '5':
             login_staff()
         elif choice == '6':
+            update_product_info()
+        elif choice == '7':
             print("Goodbye!")
             break
         else:
@@ -119,6 +122,56 @@ def login_staff():
     else:
         print("Login failed.")
         return False
+
+def update_product_info():
+    global logged_in_staff
+    if not logged_in_staff:
+        print("You must log in as staff to update products.")
+        if not login_staff():
+            return
+
+    view_products()
+    try:
+        product_id = int(input("Enter the Product ID to update: "))
+    except ValueError:
+        print("Invalid Product ID.")
+        return
+
+    cursor.execute("SELECT ProductID, Name, Price, Stock FROM Product WHERE ProductID = %s", (product_id,))
+    product = cursor.fetchone()
+    if not product:
+        print("Product not found.")
+        return
+
+    print(f"Current Name: {product[1]}")
+    new_name = input("New Name (leave blank to keep current): ")
+    print(f"Current Price: {product[2]}")
+    new_price_input = input("New Price (leave blank to keep current): ")
+    print(f"Current Stock: {product[3]}")
+    new_stock_input = input("New Stock (leave blank to keep current): ")
+
+    new_name = new_name.strip() if new_name.strip() else product[1]
+    try:
+        new_price = float(new_price_input) if new_price_input.strip() else product[2]
+    except ValueError:
+        print("Invalid price entered. Update cancelled.")
+        return
+    try:
+        new_stock = int(new_stock_input) if new_stock_input.strip() else product[3]
+    except ValueError:
+        print("Invalid stock quantity entered. Update cancelled.")
+        return
+    
+    try:
+        cursor.execute("""
+            UPDATE Product
+            SET Name = %s, Price = %s, Stock = %s
+            WHERE ProductID = %s
+        """, (new_name, new_price, new_stock, product_id))
+        db.commit()
+        print("Product updated successfully.")
+    except mysql.connector.Error as err:
+        print("Error updating product:", err)
 
 main_menu()
 
