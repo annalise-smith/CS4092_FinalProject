@@ -60,6 +60,9 @@ def view_products():
         print(f"ID: {p[0]}, {p[1]} - ${p[2]} ({p[3]} in stock)")
 
 def add_product():
+    if not login_staff():
+        return  
+
     name = input("Product name: ")
     desc = input("Description: ")
     category = input("Category: ")
