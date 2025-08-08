@@ -66,3 +66,31 @@ INSERT INTO Staff (Name, Username, Password)
 VALUES
 ('Admin One', 'admin1', 'pass123'),
 ('Admin Two', 'admin2', 'secure456');
+
+-- MULTI-TABLE QUERY: Customers and the products they purchased over $100
+SELECT 
+    Customer.Name AS CustomerName,
+    Product.Name AS ProductName,
+    Product.Price,
+    Purchase.Quantity,
+    Purchase.PurchaseDate
+FROM 
+    Purchase
+JOIN 
+    Customer ON Purchase.CustomerID = Customer.CustomerID
+JOIN 
+    Product ON Purchase.ProductID = Product.ProductID
+WHERE 
+    Product.Price > 100;
+
+-- QUERY: Top selling products
+SELECT 
+    Product.Name, SUM(Purchase.Quantity) AS TotalSold 
+FROM 
+    Purchase 
+JOIN 
+    Product ON Purchase.ProductID = Product.ProductID 
+GROUP BY 
+    Product.ProductID 
+ORDER BY 
+    TotalSold DESC;
