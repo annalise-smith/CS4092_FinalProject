@@ -1,96 +1,97 @@
-CREATE DATABASE IF NOT EXISTS ecommerce;
+-- Create DB if it doesn't exist
+IF DB_ID('ecommerce') IS NULL
+    CREATE DATABASE ecommerce;
+GO
+
 USE ecommerce;
+GO
 
--- DROP TABLES IF THEY EXIST
-DROP TABLE IF EXISTS Purchase, Product, Customer, Staff;
 
--- CUSTOMER TABLE
-CREATE TABLE Customer (
-    CustomerID INT PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(100),
-    Email VARCHAR(100) UNIQUE
+IF OBJECT_ID('dbo.Purchase', 'U') IS NOT NULL DROP TABLE dbo.Purchase;
+IF OBJECT_ID('dbo.Product',  'U') IS NOT NULL DROP TABLE dbo.Product;
+IF OBJECT_ID('dbo.Customer', 'U') IS NOT NULL DROP TABLE dbo.Customer;
+IF OBJECT_ID('dbo.Staff',    'U') IS NOT NULL DROP TABLE dbo.Staff;
+GO
+
+
+CREATE TABLE dbo.Customer (
+    CustomerID INT IDENTITY(1,1) PRIMARY KEY,
+    [Name]     VARCHAR(100),
+    Email      VARCHAR(100) UNIQUE
 );
 
--- PRODUCT TABLE
-CREATE TABLE Product (
-    ProductID INT PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(100),
-    Description TEXT,
-    Category VARCHAR(50),
-    Price DECIMAL(10,2),
-    Stock INT
+CREATE TABLE dbo.Product (
+    ProductID   INT IDENTITY(1,1) PRIMARY KEY,
+    [Name]      VARCHAR(100),
+    [Description] VARCHAR(MAX),
+    Category    VARCHAR(50),
+    Price       DECIMAL(10,2),
+    Stock       INT
 );
 
--- PURCHASE TABLE
-CREATE TABLE Purchase (
-    PurchaseID INT PRIMARY KEY AUTO_INCREMENT,
-    CustomerID INT,
-    ProductID INT,
+
+CREATE TABLE dbo.Purchase (
+    PurchaseID   INT IDENTITY(1,1) PRIMARY KEY,
+    CustomerID   INT,
+    ProductID    INT,
     PurchaseDate DATE,
-    Quantity INT,
-    FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID),
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
+    Quantity     INT,
+    CONSTRAINT FK_Purchase_Customer FOREIGN KEY (CustomerID) REFERENCES dbo.Customer(CustomerID),
+    CONSTRAINT FK_Purchase_Product  FOREIGN KEY (ProductID)  REFERENCES dbo.Product(ProductID)
 );
 
--- STAFF TABLE
-CREATE TABLE Staff (
-    StaffID INT PRIMARY KEY AUTO_INCREMENT,
-    Name VARCHAR(100),
+
+CREATE TABLE dbo.Staff (
+    StaffID  INT IDENTITY(1,1) PRIMARY KEY,
+    [Name]   VARCHAR(100),
     Username VARCHAR(50) UNIQUE,
-    Password VARCHAR(100)
+    [Password] VARCHAR(100)
 );
+GO
 
--- SAMPLE DATA
 
--- Customers
-INSERT INTO Customer (Name, Email)
-VALUES 
+
+
+INSERT INTO dbo.Customer ([Name], Email) VALUES
 ('Alice Smith', 'alice@example.com'),
-('Bob Johnson', 'bob@example.com');
+('Bob Johnson',  'bob@example.com');
 
--- Products
-INSERT INTO Product (Name, Description, Category, Price, Stock)
-VALUES
+
+INSERT INTO dbo.Product ([Name], [Description], Category, Price, Stock) VALUES
 ('Wireless Mouse', 'Ergonomic wireless mouse', 'Electronics', 25.99, 50),
-('Keyboard', 'Mechanical keyboard with RGB', 'Electronics', 79.99, 30),
-('Notebook', 'College-ruled paper notebook', 'Stationery', 3.99, 200);
+('Keyboard',       'Mechanical keyboard with RGB', 'Electronics', 79.99, 30),
+('Notebook',       'College-ruled paper notebook', 'Stationery', 3.99, 200);
 
--- Purchases
-INSERT INTO Purchase (CustomerID, ProductID, PurchaseDate, Quantity)
-VALUES
+
+INSERT INTO dbo.Purchase (CustomerID, ProductID, PurchaseDate, Quantity) VALUES
 (1, 1, '2025-08-01', 1),
 (2, 3, '2025-08-02', 5);
 
--- Staff
-INSERT INTO Staff (Name, Username, Password)
-VALUES
+
+INSERT INTO dbo.Staff ([Name], Username, [Password]) VALUES
 ('Admin One', 'admin1', 'pass123'),
 ('Admin Two', 'admin2', 'secure456');
+GO
 
--- MULTI-TABLE QUERY: Customers and the products they purchased over $100
-SELECT 
-    Customer.Name AS CustomerName,
-    Product.Name AS ProductName,
-    Product.Price,
-    Purchase.Quantity,
-    Purchase.PurchaseDate
-FROM 
-    Purchase
-JOIN 
-    Customer ON Purchase.CustomerID = Customer.CustomerID
-JOIN 
-    Product ON Purchase.ProductID = Product.ProductID
-WHERE 
-    Product.Price > 100;
 
--- QUERY: Top selling products
 SELECT 
-    Product.Name, SUM(Purchase.Quantity) AS TotalSold 
-FROM 
-    Purchase 
-JOIN 
-    Product ON Purchase.ProductID = Product.ProductID 
+    c.[Name]       AS CustomerName,
+    p.[Name]       AS ProductName,
+    p.Price,
+    pu.Quantity,
+    pu.PurchaseDate
+FROM dbo.Purchase AS pu
+JOIN dbo.Customer AS c ON pu.CustomerID = c.CustomerID
+JOIN dbo.Product  AS p ON pu.ProductID  = p.ProductID
+WHERE p.Price > 100;
+
+
+SELECT 
+    p.[Name],
+    SUM(pu.Quantity) AS TotalSold
+FROM dbo.Purchase AS pu
+JOIN dbo.Product  AS p ON pu.ProductID = p.ProductID
 GROUP BY 
-    Product.ProductID 
+    p.ProductID, p.[Name]
 ORDER BY 
     TotalSold DESC;
