@@ -1,28 +1,30 @@
-import mysql.connector
+import pyodbc
 from datetime import date
 
 print("Script started")
 
 logged_in_staff = None
 logged_in_customer = None
+db = None
+cursor = None
 
 try:
     print("Trying to connect to database...")
-    db = mysql.connector.connect(
-        host="localhost",
-        user="annalise.smith05@gmail.com",
-        password="TemporaryForCla$$1",
-        database="ecommerce"
+    db = pyodbc.connect(
+        "DRIVER={ODBC Driver 17 for SQL Server};"
+        "SERVER=localhost\SQLEXPRESS;"
+        "DATABASE=ecommerce;"
+        "Trusted_Connection=yes;"
     )
     print("Connected!")
 
     cursor = db.cursor()
-    cursor.execute("SHOW TABLES;")
+    cursor.execute("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES")
     print("Connected successfully. Tables in database:")
     for table in cursor:
         print(table)
 
-except mysql.connector.Error as err:
+except pyodbc.Error as err:
     print("Connection error:", err)
 
 except Exception as e:
@@ -69,7 +71,8 @@ def login_customer():
     global logged_in_customer
     email = input("Customer email: ")
     # Might add password later, for now just email is enough as simple login
-    cursor.execute("SELECT CustomerID, Name FROM Customer WHERE Email = %s", (email,))
+    print(email)
+    cursor.execute("SELECT CustomerID, Name FROM Customer WHERE Email = ?", (email,))
     result = cursor.fetchone()
     if result:
         logged_in_customer = {'id': result[0], 'name': result[1]}
@@ -84,7 +87,7 @@ def login_staff():
     username = input("Staff username: ")
     password = input("Staff password: ")
 
-    cursor.execute("SELECT StaffID FROM Staff WHERE Username = %s AND Password = %s", (username, password))
+    cursor.execute("SELECT StaffID FROM Staff WHERE Username = ? AND Password = ?", (username, password))
     result = cursor.fetchone()
     
     if result:
@@ -223,6 +226,7 @@ def logout():
         logged_in_customer = None
     if not logged_in_staff and not logged_in_customer:
         print("No user currently logged in.")
+
 
 main_menu()
 
